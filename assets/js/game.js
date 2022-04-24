@@ -10,40 +10,80 @@ let currentRow = 0; let nextRowBlock = 0; let remNotification = 0;
 
 const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
 
+let bigContainer = document.createElement('div');
+bigContainer.id = 'bigContainer';
+document.body.append(bigContainer);
+
 let containerA = document.createElement('div');
 containerA.id = 'containerA';
-document.body.append(containerA);
+containerA.style.width = '50%';
+containerA.style.float = 'left';
+bigContainer.append(containerA);
+// document.body.append(containerA);
 
 let containerB = document.createElement('div');
 containerB.id = 'containerB';
-document.body.append(containerB);
+containerB.style.width = '150px';
+containerB.style.height = '400px';
+containerB.style.float = 'right';
+containerB.style.overflow = 'scroll';
+bigContainer.append(containerB);
+// document.body.append(containerB);
 
-let textList = document.createElement('div');
-textList.className = 'textBoxy';
-textList.id = 'noID';
-textList.textContent = '';
-textList.contentEditable = 'true';
+// let textList = document.createElement('div');
+// textList.className = 'textBoxy';
+// textList.style.height = '100%';
+// textList.id = 'noID';
+// textList.textContent = '';
+// textList.contentEditable = 'false';
 
 // https://github.com/AnsonLai/OctordleReformat/
 // https://stackoverflow.com/questions/5754712/add-characters-to-a-string-in-javascript
 // https://stackoverflow.com/questions/9980416/how-can-i-insert-new-line-carriage-returns-into-an-element-textcontent
-textList.setAttribute('style', 'white-space: pre;');
+// https://coder-coder.com/display-divs-side-by-side/
 
-let pre = ''
+// textList.setAttribute('style', 'white-space: pre;');
 
-advanced.forEach(element => {
-	if (element[0] === 'Z') {
-		textList.textContent += pre + element;
-		pre = '\n'
-	};
-});
+// let pre = ''
+
+// advanced.forEach(element => {
+// 	if (element[0] === 'A') {
+// 		let p = document.createElement('p');
+// 		p.textContent = element;
+// 		containerB.append(p);
+// 		// textList.textContent += pre + element;
+// 		// pre = '\n';
+// 	};
+// });
+
+// containerB.innerHTML = '';
 
 // textList.innerText = 'Nothing to see guessing!\nMore\nMore\nAgain\nAgain'
 
-containerB.append(textList);
+// containerB.append(textList);
 
 gameStart();
 
+function updateContainer(containerL){
+	let candidateWords = []
+
+	// construct known
+
+	let known = ' '.repeat(5);
+
+	// construct suspected
+
+	advanced.forEach(element => {
+		if (element[0] === 'A') {
+			let p = document.createElement('p');
+			p.textContent = element;
+			containerL.append(p);
+		};
+});
+
+containerB.innerHTML = '';
+
+}
 
 function openModal(type, notification) {
 	let modal = document.createElement('div');
