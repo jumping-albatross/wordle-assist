@@ -63,8 +63,15 @@ bigContainer.append(containerB);
 // containerB.append(textList);
 
 gameStart();
+updateContainer(containerB);
 
 function updateContainer(containerL){
+	// https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
+
+	// clear the container
+
+	containerL.innerHTML = '';
+
 	let candidateWords = []
 
 	// construct known
@@ -80,8 +87,6 @@ function updateContainer(containerL){
 			containerL.append(p);
 		};
 });
-
-containerB.innerHTML = '';
 
 }
 
