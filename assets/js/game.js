@@ -63,30 +63,79 @@ bigContainer.append(containerB);
 // containerB.append(textList);
 
 gameStart();
-updateContainer(containerB);
+updateContainer(advanced, [], ['', '', '', '', ''], ['', '', '', '', ''], []);
 
-function updateContainer(containerL){
+function updateContainer(wordList, known_letters, known_positions, excluded_positions, excluded_letters_2) {
 	// https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
 
+	console.log('>> updateContainer');
+
+	console.log('known_letters, known_positions, excluded_positions', known_letters, known_positions, excluded_positions);
+	console.log('length of wordList', wordList.length);
+
 	// clear the container
+	let container = containerB;
+	container.innerHTML = '';
 
-	containerL.innerHTML = '';
+	// TO DO
+	/*	exclude word:
+			without		 					known_letters
+			with							excluded_letters_2
+			without correct letters in	 	known_positions
+			with wrong letters in 			excluded_positions
+		ignore excluded_letters variable
+	*/
 
-	let candidateWords = []
+	let areLettersKnown = known_positions.join('').length > 0;
 
-	// construct known
+	wordList.forEach(word => {
 
-	let known = ' '.repeat(5);
+		let isExcluded = false;
 
-	// construct suspected
+		// #1 exclude words without known_letters
+		known_letters.forEach(kl => {
+			if (!word.includes(kl)) {
+				isExcluded = true;
+			}
+		});
 
-	advanced.forEach(element => {
-		if (element[0] === 'A') {
-			let p = document.createElement('p');
-			p.textContent = element;
-			containerL.append(p);
+		// #1, part 2 exclude words with excluded_letters_2
+		excluded_letters_2.forEach(el =>{
+			if(word.includes(el)){
+				isExcluded = true;
+			}
+		})
+
+
+		// #2 exclude words without correct letters in their correct positions
+		if (areLettersKnown) {
+			for (let i = 0; i < word.length; i++) {
+				if (known_positions[i] != '' && known_positions[i] != word[i]) {
+					isExcluded = true;
+				}
+			}
+		}
+
+		// #3 exclude 	with incorrect letters in	unknown_positions
+		if (!isExcluded) {
+			for (let i = 0; i < excluded_positions.length; i++) {
+				if (excluded_positions[i] === word[i]) {
+					isExcluded = true;
+				}
+			}
 		};
-});
+
+		if (!isExcluded) {
+			let p = document.createElement('p');
+			p.textContent = word;
+			container.append(p);
+		};
+
+	});
+	// if (element[0] === 'A') {
+	// 	let p = document.createElement('p');
+	// 	p.textContent = element;
+	// 	containerL.append(p);
 
 }
 
@@ -149,6 +198,7 @@ function addLogo() {
 
 function setGlobal() {
 	console.log('> setGlobal()');
+	updateContainer(advanced, [], ['', '', '', '', ''], ['', '', '', '', ''], []);
 	gameFin = 0;
 	currentRow = 0;
 	nextRowBlock = 0;
@@ -264,7 +314,7 @@ function gameStart() {
 }
 
 function keyPress(event) {
-	console.log(`<> keyPress(${event.key})`);
+	// console.log(`<> keyPress(${event.key})`);
 
 	if (gameFin == 0) {
 		let alphabet = 'abcdefghijklmnopqrstuvwxyz';
@@ -431,9 +481,73 @@ function checkAnswer(wordRow, answer) {
 		}, 250);
 	}
 	else {
+		filterWords(wordRow);
 		nextRowBlock = 0;
 		currentRow++;
 	}
+}
+var z;
+function filterWords(wordRow) {
+	/* filterWords examines the current word, determines
+	 * the duplicate letters, the known letters and the
+	 * excluded letters. Then suggested words are filtered
+	 * to remove possibilities.
+	 */
+
+	let word = wordRow.textContent;
+
+	console.log('>> filterWords');
+
+	let duplicate_letters = new Set();
+	let known_positions = ['', '', '', '', ''];
+	let known_letters = '';
+	let excluded_positions = ['', '', '', '', ''];
+	let excluded_letters = [];
+
+	for (let i = 0; i < wordRow.childNodes.length; i++) {
+		const element = wordRow.childNodes[i];
+		let letter = element.innerText;
+		let colour = element.className;
+		// console.log(colour, letter, colour.toUpperCase().includes('GOLD'));
+
+		if (colour.toUpperCase().includes('GOLD')) {
+			excluded_positions[i] = letter;
+			known_letters += letter;
+		}
+		else if (colour.toUpperCase().includes('GREY')) {
+			excluded_positions[i] = letter;
+			excluded_letters.push(letter);
+		}
+		else {
+			known_positions[i] = letter;
+			known_letters += letter;
+		}
+	}
+
+	let excluded_letters_2 = [];
+
+	excluded_letters.forEach(letter => {
+		if (!known_letters.includes(letter)) {
+			excluded_letters_2.push(letter);
+		}
+	});
+
+	console.log('word', word);
+	console.log('dup_let', duplicate_letters);
+	console.log('kn_let', known_letters.split(''));
+	console.log('kn_pos', known_positions);
+	console.log('ex_pos', excluded_positions);
+	console.log('ex_let_2', excluded_letters_2);
+
+
+	// function updateContainer(wordList, known_letters, known_positions, excluded_positions) {
+
+
+	let wordList = containerB.innerText.split('\n\n');
+	updateContainer(wordList, known_letters.split(''), known_positions, excluded_positions, excluded_letters_2);
+	// updateContainer(wordList, known_positions, excluded_letters_2, excluded_positions);
+
+	// wordRow.childNodes[i].className = 'row_block ' + blockClass;
 }
 
 function submitWord(wordRow) {
@@ -474,7 +588,7 @@ function addKeys(el, layout, keyClass) {
 }
 
 function addLetter(rowBlockEl, letter) {
-	console.log(`<> addLetter(${rowBlockEl}, ${letter})`);
+	// console.log(`<> addLetter(${rowBlockEl}, ${letter})`);
 	if (remNotification == 0) {
 		remNotification = 1;
 		document.getElementById('notification').innerText = '';
